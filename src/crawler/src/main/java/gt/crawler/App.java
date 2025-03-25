@@ -6,66 +6,78 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class App {
 
     private static final String BASE_URL = "https://www.cc.gatech.edu";
-    private static final String FACULTY_DIRECTORY_URL = "https://www.cc.gatech.edu/people/faculty";
+    private static final Map<String, Integer> TAG_WEIGHTS = Map.of(
+        "title", 5,
+        "h1", 4,
+        "h2", 3,
+        "h3", 2,
+        "p", 1
+    );
+
+    private static final Set<String> visited = new HashSet<>();
+    private static final int MAX_DEPTH = 1;
 
     public static void main(String[] args) {
-        System.out.println("Starting Georgia Tech CoC Faculty Crawler...");
-        crawlFacultyDirectory();
+        System.out.println("Starting Generic Web Crawler with Word Ranking...\n");
+        crawl(BASE_URL, 0);
     }
 
-    private static void crawlFacultyDirectory() {
+    private static void crawl(String url, int depth) {
+        if (visited.contains(url) || depth > MAX_DEPTH) return;
+        visited.add(url);
+
         try {
-            Document doc = Jsoup.connect(FACULTY_DIRECTORY_URL)
-                                .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
-                                .get();
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
+                    .get();
 
-            Elements profileLinks = doc.select("a[href^=/people/]");
-            Set<String> uniqueProfiles = new HashSet<>();
+            System.out.println("Crawling: " + url);
 
-            for (Element link : profileLinks) {
-                String profileUrl = BASE_URL + link.attr("href");
+            Map<String, Integer> wordScores = scoreWordsFromPage(doc);
+            wordScores.entrySet().stream()
+                    .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+                    .limit(10)
+                    .forEach(entry -> System.out.println(entry.getKey() + " : " + entry.getValue()));
+            System.out.println();
 
-                // Avoid duplicate profiles
-                if (uniqueProfiles.add(profileUrl)) {
-                    crawlFacultyProfile(profileUrl);
-                    Thread.sleep(1000); // polite crawling (1-second delay)
+            Elements links = doc.select("a[href]");
+            for (Element link : links) {
+                String absHref = link.absUrl("href");
+                if (absHref.startsWith(BASE_URL)) {
+                    crawl(absHref, depth); // Internal: same depth
+                } else {
+                    crawl(absHref, depth + 1); // External: one hop only
                 }
             }
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Error crawling directory: " + e.getMessage());
+
+        } catch (IOException e) {
+            System.err.println("Failed to crawl: " + url + " | " + e.getMessage());
         }
     }
 
-    private static void crawlFacultyProfile(String url) {
-        try {
-            System.out.println("\nCrawling: " + url);
+    private static Map<String, Integer> scoreWordsFromPage(Document doc) {
+        Map<String, Integer> wordScores = new HashMap<>();
 
-            Document doc = Jsoup.connect(url)
-                                .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
-                                .get();
+        for (Map.Entry<String, Integer> entry : TAG_WEIGHTS.entrySet()) {
+            String tag = entry.getKey();
+            int weight = entry.getValue();
 
-            String name = doc.selectFirst("h1.page-title").text();
-            Element titleElement = doc.selectFirst(".field--name-field-position");
-            String title = titleElement != null ? titleElement.text() : "No title listed";
-            Element emailElement = doc.selectFirst("a[href^=mailto:]");
-            String email = emailElement != null ? emailElement.text() : "No email listed";
-            Elements researchElements = doc.select(".field--name-field-research-interests .field__item");
-            String interests = researchElements.eachText().isEmpty() ? "Not listed" : String.join(", ", researchElements.eachText());
-
-            System.out.println("Name: " + name);
-            System.out.println("Title: " + title);
-            System.out.println("Email: " + email);
-            System.out.println("Research Interests: " + interests);
-
-        } catch (IOException e) {
-            System.err.println("Error crawling profile: " + url);
-            e.printStackTrace();
+            Elements elements = doc.select(tag);
+            for (Element el : elements) {
+                String[] words = el.text().toLowerCase().split("\\W+");
+                for (String word : words) {
+                    if (!word.isBlank()) {
+                        wordScores.put(word, wordScores.getOrDefault(word, 0) + weight);
+                    }
+                }
+            }
         }
+
+        return wordScores;
     }
 }
