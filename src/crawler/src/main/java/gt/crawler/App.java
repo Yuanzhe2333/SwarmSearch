@@ -8,7 +8,7 @@ public class App {
 
         MongoClient mc = MongoClient.getInstance();
 
-        mc.insertIntoCollection("visited", new Document("url", "bing.com"));
+        mc.insertIntoCollection("visited", new Document("_id", "bing.com"));
 
         // crawl(BASE_URL, 0);
         mc.close();

@@ -48,9 +48,21 @@ public class MongoClient {
    */
   public void insertIntoCollection(String collectionName, Document doc) {
     MongoDatabase database = mongoClient.getDatabase("CrawlData");
-    MongoCollection<Document> visited = database.getCollection(collectionName);
+    MongoCollection<Document> collection = database.getCollection(collectionName);
 
-    visited.insertOne(doc);
+    collection.insertOne(doc);
+  }
+
+  /**
+   * Get a document from a collection in the CrawlData database.
+   * 
+   * @param collectionName The name of the collection to get the document from.
+   * @return The document from the collection.
+   */
+  public Document getDocumentFromCollection(String collectionName, String objId) {
+    MongoDatabase database = mongoClient.getDatabase("CrawlData");
+    MongoCollection<Document> collection = database.getCollection(collectionName);
+    return collection.find(new Document("_id", objId)).first();
   }
 
   /**
