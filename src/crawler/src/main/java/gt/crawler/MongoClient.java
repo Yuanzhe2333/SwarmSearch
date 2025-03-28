@@ -62,6 +62,7 @@ public class MongoClient {
   public Document getDocumentFromCollection(String collectionName, String objId) {
     MongoDatabase database = mongoClient.getDatabase("CrawlData");
     MongoCollection<Document> collection = database.getCollection(collectionName);
+
     return collection.find(new Document("_id", objId)).first();
   }
 

@@ -8,9 +8,9 @@ public class App {
 
         MongoClient mc = MongoClient.getInstance();
 
-        mc.insertIntoCollection("visited", new Document("_id", "bing.com"));
+        Crawler c1 = new Crawler();
+        c1.startCrawler("https://gatech.edu", 2);
 
-        // crawl(BASE_URL, 0);
         mc.close();
     }
 }
