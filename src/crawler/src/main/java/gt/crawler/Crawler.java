@@ -26,29 +26,32 @@ public class Crawler {
 
   private void crawl(String startingUrl, int bfsPerDFS) {
     Set<String> visitedCache = new HashSet<>();
-    Deque<String> dq = new ArrayDeque<String>();
-    dq.offerLast(startingUrl);
+    mc.addUrlToBack(startingUrl);
 
     while (true) {
       for (int i = 0; i < bfsPerDFS; i++) {
-        if (dq.size() == 0) {
-          return;
+        org.bson.Document doc = mc.popUrlFromFront();
+
+        if (doc == null) {
+          break;
         }
 
-        String url = dq.pollFirst();
-        visitPage(url, visitedCache, dq);
+        String url = doc.getString("url");
+        visitPage(url, visitedCache);
       }
 
-      if (dq.size() == 0) {
+      org.bson.Document doc = mc.popUrlFromBack();
+
+      if (doc == null) {
         return;
       }
 
-      String url = dq.pollLast();
-      visitPage(url, visitedCache, dq);
+      String url = doc.getString("url");
+      visitPage(url, visitedCache);
     }
   }
 
-  private void visitPage(String url, Set<String> visitedCache, Deque<String> dq) {
+  private void visitPage(String url, Set<String> visitedCache) {
     try {
       if (visitedCache.contains(url) || mc.getDocumentFromCollection("visited", url) != null) {
         visitedCache.add(url);
@@ -67,8 +70,8 @@ public class Crawler {
         String absHref = link.absUrl("href");
 
         // remove fragments
-        String parsedRef = absHref.split("#")[0];
-        dq.offerLast(parsedRef);
+        String parsedHref = absHref.split("#")[0];
+        mc.addUrlToBack(parsedHref);
       }
     } catch (IOException e) {
       System.err.println("Failed to visit page: " + e.getMessage());
