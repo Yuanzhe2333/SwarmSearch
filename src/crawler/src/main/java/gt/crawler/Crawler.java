@@ -1,8 +1,6 @@
 package gt.crawler;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +8,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
 public class Crawler {
   private MongoClient mc;
@@ -53,8 +54,16 @@ public class Crawler {
 
   private void visitPage(String url, Set<String> visitedCache) {
     try {
+      // Force-remove a specific URL from the "visited" collection for testing
+      if (url.equals("https://fingertip-onstage.netlify.app/")) {
+        MongoDatabase database = mc.getMongoClient().getDatabase("CrawlData");
+        MongoCollection<org.bson.Document> collection = database.getCollection("visited");
+        collection.deleteOne(new org.bson.Document("_id", url));
+        System.out.println("Manually removed visited flag for: " + url);
+      }
       if (visitedCache.contains(url) || mc.getDocumentFromCollection("visited", url) != null) {
         visitedCache.add(url);
+        System.out.println("Already visited: " + url);
         return;
       }
 
@@ -73,6 +82,38 @@ public class Crawler {
         String parsedHref = absHref.split("#")[0];
         mc.addUrlToBack(parsedHref);
       }
+
+      // Call LLM to parse the page content into structured JSON
+      String rawText = doc.body().text();
+
+      // OPTIONAL: limit content length
+      if (rawText.length() > 4000) {
+        rawText = rawText.substring(0, 4000);
+      }
+
+      System.out.println("====== Raw Text Preview ======");
+      System.out.println(rawText.substring(0, Math.min(rawText.length(), 500))); // show first 500 chars
+      System.out.println("================================");
+
+      // Get JSON string from LLM
+      String llmResponse = LLMClient.analyzePageContent(rawText);
+
+      System.out.println("====== LLM Response ======");
+      System.out.println(llmResponse);
+      System.out.println("================================");
+
+      // Convert to MongoDB document and print it
+      org.bson.Document parsedDoc = org.bson.Document.parse(llmResponse);
+      parsedDoc.append("source_url", url);
+
+      System.out.println("====== Parsed JSON for MongoDB ======");
+      System.out.println(parsedDoc.toJson());
+      System.out.println("================================");
+
+      // Store into MongoDB
+      mc.insertIntoCollection("ParsedPages", parsedDoc);
+      
+
     } catch (IOException e) {
       System.err.println("Failed to visit page: " + e.getMessage());
     }

@@ -9,7 +9,7 @@ public class App {
         MongoClient mc = MongoClient.getInstance();
 
         Crawler c1 = new Crawler();
-        c1.startCrawler("https://gatech.edu", 2);
+        c1.startCrawler("https://fingertip-onstage.netlify.app/", 2);
 
         mc.close();
     }
