@@ -60,10 +60,13 @@ public class Crawler {
 
       visitedCache.add(url);
       mc.insertIntoCollection("visited", new org.bson.Document("_id", url));
+      Elastic ec = new Elastic("localhost", 9200, "http", "WUotU0NKWUJMUzhZWmp2enFUYTI6R3ZnTWFHYjdTaVc4Y3E2QV9nQWh4Zw==");
 
       Document doc = Jsoup.connect(url)
           .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
           .get();
+
+      ec.insertHtml("crawled-pages", url, doc.html());
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {
