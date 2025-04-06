@@ -11,25 +11,24 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class Crawler {
+public class Crawler implements Runnable {
   private MongoClient mc;
+  private String startingUrl;
+  private int bfsPerDfsRatio;
 
-  public Crawler() {
+  public Crawler(String startingUrl, int bfsPerDfsRatio) {
     this.mc = MongoClient.getInstance();
+    this.startingUrl = startingUrl;
+    this.bfsPerDfsRatio = bfsPerDfsRatio;
   }
-
-  public void startCrawler(String startingUrl, int bfsPerDFS) {
-    // might not be a necessary function but considering doing setup beforhand. Can
-    // remove if not necessary
-    crawl(startingUrl, bfsPerDFS);
-  }
-
-  private void crawl(String startingUrl, int bfsPerDFS) {
+   
+  @Override
+  public void run() {
     Set<String> visitedCache = new HashSet<>();
-    mc.addUrlToBack(startingUrl);
+    mc.addUrlToBack(this.startingUrl);
 
     while (true) {
-      for (int i = 0; i < bfsPerDFS; i++) {
+      for (int i = 0; i < this.bfsPerDfsRatio; i++) {
         org.bson.Document doc = mc.popUrlFromFront();
 
         if (doc == null) {

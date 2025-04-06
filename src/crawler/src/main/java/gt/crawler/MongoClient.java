@@ -105,7 +105,7 @@ public class MongoClient {
   }
 
   /**
-   * Adds a URL to the "PageQueue" Collection with the correct sequence number
+   * Adds a URL to the "PageQueue" Collection with the correct sequence number (doesn't guarantee its lowest - 1 because other instances could be inserting)
    *
    * @param url to add to database
    */
