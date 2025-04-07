@@ -15,13 +15,21 @@ public class Crawler implements Runnable {
   private MongoClient mc;
   private String startingUrl;
   private int bfsPerDfsRatio;
+  private Elastic elastic;
 
   public Crawler(String startingUrl, int bfsPerDfsRatio) {
     this.mc = MongoClient.getInstance();
     this.startingUrl = startingUrl;
     this.bfsPerDfsRatio = bfsPerDfsRatio;
+
+    Config config = Config.getInstance();
+    String host = config.getConfig().getProperty("elastic.host");
+    int port = Integer.parseInt(config.getConfig().getProperty("elastic.port"));
+    String scheme = config.getConfig().getProperty("elastic.scheme");
+    String apiKey = config.getConfig().getProperty("elastic.apikey").trim();;
+    this.elastic = new Elastic(host, port, scheme, apiKey);
   }
-   
+
   @Override
   public void run() {
     Set<String> visitedCache = new HashSet<>();
@@ -63,6 +71,8 @@ public class Crawler implements Runnable {
       Document doc = Jsoup.connect(url)
           .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
           .get();
+
+      elastic.insertHtml("crawled-pages", url, doc.html());
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {
