@@ -132,6 +132,5 @@ public class Crawler implements Runnable {
 
     // Store into MongoDB
     mc.insertIntoCollection("ParsedPages", parsedDoc);
-    throw new UnsupportedOperationException("Unimplemented method 'parsePageWithLLM'");
   }
 }
