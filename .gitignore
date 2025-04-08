@@ -1,1 +1,3 @@
 config/
+elastic-start-local/
+src/crawler/target/

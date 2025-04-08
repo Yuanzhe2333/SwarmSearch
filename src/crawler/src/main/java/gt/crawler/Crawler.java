@@ -9,28 +9,38 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class Crawler {
+
+public class Crawler implements Runnable {
+
   private MongoClient mc;
+  private String startingUrl;
+  private int bfsPerDfsRatio;
+  private Elastic elastic;
 
-  public Crawler() {
+  public Crawler(String startingUrl, int bfsPerDfsRatio) {
     this.mc = MongoClient.getInstance();
+    this.startingUrl = startingUrl;
+    this.bfsPerDfsRatio = bfsPerDfsRatio;
+
+    Config config = Config.getInstance();
+    String host = config.getConfig().getProperty("elastic.host");
+    int port = Integer.parseInt(config.getConfig().getProperty("elastic.port"));
+    String scheme = config.getConfig().getProperty("elastic.scheme");
+    String apiKey = config.getConfig().getProperty("elastic.apikey").trim();;
+    this.elastic = new Elastic(host, port, scheme, apiKey);
   }
 
-  public void startCrawler(String startingUrl, int bfsPerDFS) {
-    // might not be a necessary function but considering doing setup beforhand. Can
-    // remove if not necessary
-    crawl(startingUrl, bfsPerDFS);
-  }
-
-  private void crawl(String startingUrl, int bfsPerDFS) {
+  @Override
+  public void run() {
     Set<String> visitedCache = new HashSet<>();
-    mc.addUrlToBack(startingUrl);
+    mc.addUrlToBack(this.startingUrl);
 
     while (true) {
-      for (int i = 0; i < bfsPerDFS; i++) {
+      for (int i = 0; i < this.bfsPerDfsRatio; i++) {
         org.bson.Document doc = mc.popUrlFromFront();
 
         if (doc == null) {
@@ -73,6 +83,8 @@ public class Crawler {
       Document doc = Jsoup.connect(url)
           .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
           .get();
+
+      elastic.insertHtml("crawled-pages", url, doc.html());
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {

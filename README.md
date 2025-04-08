@@ -55,14 +55,38 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - Open-source deployment setup for future scalability.
 
 ## Contributors
-- Pian Wan
 - Oscar Zhang
-- Yen-Shun Lu
 - Tracy Guo
 - Yuanzhe Liu
+- Yen-Shun Lu
+- Pian Wan
+
+## Installation Instructions
+Within the src/crawler directory run
+
+```bash
+mvn install
+```
+
+to install necessary dependencies.
+
+Run the crawler using
+
+```bash
+mvn clean compile exec:java
+```
+
+For the application to work, config/config.properties must be setup under src/crawler with the following properties:
+1. mongodb.uri: The complete MongoDB URI to connect to the database. This should include the protocol, username, password, host, and any necessary connection parameters.
+2. elastic.host: The hostname or IP address where your Elasticsearch instance is hosted.
+3. elastic.port: The port number the Elastic instance is running on.
+4. elastic.scheme: The URL scheme used to connect to Elasticsearch (http or https).
+5. elastic.apikey: The Base64-encoded API key used to authenticate requests to your Elasticsearch instance. Make sure there are no leading or trailing spaces.
+
+
 
 ---
 For questions or contributions, please contact:
 
-`{pianwan, ozhang31, ylu776, tguo72, yliu3794}@gatech.edu`
+`{ozhang31, tguo72, yliu3794, ylu776, pianwan}@gatech.edu`
 

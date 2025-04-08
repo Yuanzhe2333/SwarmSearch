@@ -1,0 +1,5 @@
+gt/crawler/App.class
+gt/crawler/MongoClient.class
+gt/crawler/Config.class
+gt/crawler/Crawler.class
+gt/crawler/Elastic.class
