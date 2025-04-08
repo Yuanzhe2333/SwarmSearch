@@ -64,13 +64,7 @@ public class Crawler implements Runnable {
 
   private void visitPage(String url, Set<String> visitedCache) {
     try {
-      // Force-remove a specific URL from the "visited" collection for testing
-      if (url.equals("https://fingertip-onstage.netlify.app/")) {
-        MongoDatabase database = mc.getMongoClient().getDatabase("CrawlData");
-        MongoCollection<org.bson.Document> collection = database.getCollection("visited");
-        collection.deleteOne(new org.bson.Document("_id", url));
-        System.out.println("Manually removed visited flag for: " + url);
-      }
+      
       if (visitedCache.contains(url) || mc.getDocumentFromCollection("visited", url) != null) {
         visitedCache.add(url);
         System.out.println("Already visited: " + url);
