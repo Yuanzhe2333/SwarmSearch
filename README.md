@@ -84,6 +84,52 @@ For the application to work, config/config.properties must be setup under src/cr
 5. elastic.apikey: The Base64-encoded API key used to authenticate requests to your Elasticsearch instance. Make sure there are no leading or trailing spaces.
 
 
+## Search Engine
+### Prerequisite
+You have to have `npm` installed.
+You have to set up `elastic search` on port `9200`. (you can use docker)
+
+### Getting started
+1. Clone this repository:
+
+    ```bash
+    git clone https://github.com/Yuanzhe2333/SwarmSearch.git
+    ```
+
+2. Install the required dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+3. Start backend service
+    - Install required packages
+    ```bash
+        cd src/search_engine/backend/
+        python index_data.py
+
+        pip install "fastapi[standard]"
+        pip install torch
+        pip install sentence_transformers
+    ```
+
+    - Run service
+    ```bash
+    fastapi dev main.py
+    ```
+
+4. Start frontend service
+    - Install required packages
+    ```bash
+    cd src/search_engine/frontend
+
+    npm install
+    npm install -g @vue/cli@latest
+    ```
+
+    - Run service
+    ```
+    npm run serve
+    ```
 
 ---
 For questions or contributions, please contact:
