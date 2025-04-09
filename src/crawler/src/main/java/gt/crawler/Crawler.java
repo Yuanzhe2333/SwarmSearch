@@ -50,7 +50,7 @@ public class Crawler implements Runnable {
         String url = doc.getString("url");
         try {
           visitPage(url, visitedCache);
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
           System.err.println(e);
         }
       }
@@ -64,15 +64,14 @@ public class Crawler implements Runnable {
       String url = doc.getString("url");
       try {
         visitPage(url, visitedCache);
-      } catch (URISyntaxException e) {
+      } catch (Exception e) {
         System.err.println(e);
       }
     }
   }
 
-  private void visitPage(String url, Set<String> visitedCache) throws URISyntaxException {
+  private void visitPage(String url, Set<String> visitedCache) throws URISyntaxException, InterruptedException {
     try {
-
       if (visitedCache.contains(url) || mc.getDocumentFromCollection("visited", url) != null) {
         visitedCache.add(url);
         System.out.println("Already visited: " + url);
@@ -80,6 +79,13 @@ public class Crawler implements Runnable {
       }
 
       visitedCache.add(url);
+
+      if (!RobotsTxtHandler.isUrlAllowed(url)) {
+        System.out.println("Url not allowed: " + url);
+        return;
+      }
+
+      RobotsTxtHandler.handleRobotsTxt(url);
       mc.insertIntoCollection("visited", new org.bson.Document("_id", url));
 
       Document doc = Jsoup.connect(url)
