@@ -9,6 +9,7 @@ SwarmSearch is a specialized search engine tailored exclusively for the Georgia 
 General-purpose search engines like Google or Yahoo often return excessive unrelated results, making the process of finding specific academic resources inefficient. SwarmSearch addresses this issue by indexing only content from relevant Georgia Tech departments, significantly reducing irrelevant search results and improving search precision and speed.
 
 ## Objectives
+
 - Develop a specialized, efficient search engine focused on Georgia Tech’s academic ecosystem.
 - Enhance search relevance by directly indexing content from Georgia Tech’s college websites.
 - Reduce query latency compared to standard web search tools.
@@ -16,29 +17,35 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 ## Features
 
 ### Web Crawling
+
 - Utilizes JSoup for efficient web scraping and parsing of HTML content.
 - Employs a combination of Breadth-First Search (BFS) and Depth-First Search (DFS) crawling strategies to optimize data collection.
 - Implements MongoDB to store crawled URLs for scalability and rapid retrieval.
 
 ### Indexing & Search
+
 - Uses Apache Lucene to create and manage a powerful reverse index for fast query retrieval.
 - Tests multiple scoring algorithms, including BM25, TF-IDF, LMJelinekMercer, and DFR similarity models, to identify the best-performing solution.
 
 ### User Interface
+
 - Designed with React for a clean, intuitive user experience.
 - Features advanced search capabilities, auto-complete suggestions, filters, and pagination.
 
 ### Deployment
+
 - Backend services implemented using Spring Boot for efficient API handling.
 - Initial deployment on Apache Tomcat to test in a controlled environment.
 
 ## Evaluation and Testing
 
 ### Relevance and Precision
+
 - Precision testing against Google’s search results for Georgia Tech-specific queries.
 - Calculation formula: `(Relevant results retrieved) / (Total results retrieved)`.
 
 ### Latency Evaluation
+
 - Round-trip request latency testing to benchmark performance against Google using standardized queries.
 
 ## Technology Stack
@@ -51,10 +58,12 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - **Deployment:** Apache Tomcat
 
 ## Deployment
+
 - Deployed initially on local servers using Apache Tomcat for controlled testing environments.
 - Open-source deployment setup for future scalability.
 
 ## Contributors
+
 - Oscar Zhang
 - Tracy Guo
 - Yuanzhe Liu
@@ -62,6 +71,9 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - Pian Wan
 
 ## Installation Instructions
+
+### Crawler (under src/crawler)
+
 Within the src/crawler directory run
 
 ```bash
@@ -77,62 +89,55 @@ mvn clean compile exec:java
 ```
 
 For the application to work, config/config.properties must be setup under src/crawler with the following properties:
+
 1. mongodb.uri: The complete MongoDB URI to connect to the database. This should include the protocol, username, password, host, and any necessary connection parameters.
 2. elastic.host: The hostname or IP address where your Elasticsearch instance is hosted.
 3. elastic.port: The port number the Elastic instance is running on.
 4. elastic.scheme: The URL scheme used to connect to Elasticsearch (http or https).
 5. elastic.apikey: The Base64-encoded API key used to authenticate requests to your Elasticsearch instance. Make sure there are no leading or trailing spaces.
 
+### Search Engine (under src/search_engine/backend)
 
-## Search Engine
-### Prerequisite
+#### Prerequisite
+
 You have to have `npm` installed.
-You have to set up `elastic search` on port `9200`. (you can use docker)
 
-### Getting started
-1. Clone this repository:
+````
+1. Install the required dependencies:
 
-    ```bash
-    git clone https://github.com/Yuanzhe2333/SwarmSearch.git
-    ```
+```bash
+pip install -r requirements.txt
+````
 
-2. Install the required dependencies:
+2. Setup indicies for Elastic (only needed once)
 
-    ```bash
-    pip install -r requirements.txt
-    ```
-3. Start backend service
-    - Install required packages
-    ```bash
-        cd src/search_engine/backend/
-        python index_data.py
+```bash
+python3 index_setup.py
+```
 
-        pip install "fastapi[standard]"
-        pip install torch
-        pip install sentence_transformers
-    ```
+3. Run service
 
-    - Run service
-    ```bash
-    fastapi dev main.py
-    ```
+```bash
+fastapi dev main.py
+```
 
-4. Start frontend service
-    - Install required packages
-    ```bash
-    cd src/search_engine/frontend
+### Frontend (under src/search_engine/frontend)
 
-    npm install
-    npm install -g @vue/cli@latest
-    ```
+- Install required packages
 
-    - Run service
-    ```
-    npm run serve
-    ```
+```bash
+npm install
+npm install -g @vue/cli@latest
+```
+
+- Run service
+
+```
+npm run serve
+```
 
 ---
+
 For questions or contributions, please contact:
 
 `{ozhang31, tguo72, yliu3794, ylu776, pianwan}@gatech.edu`
-
