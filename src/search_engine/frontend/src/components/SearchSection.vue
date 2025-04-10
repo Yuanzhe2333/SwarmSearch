@@ -18,7 +18,7 @@
         type="text"
         v-model="searchQuery"
         placeholder="Andromeda galaxy"
-        @keyup.enter="handleSearch"
+        @keyup.enter="debouncedHandleSearch"
       />
       <span class="icon-container">
         <Transition name="fade">
@@ -87,7 +87,7 @@ export default {
       this.pageOffset = 0;
       if (this.searchQuery !== "") {
         this.getYearOptions();
-        this.handleSearch();
+        this.debouncedHandleSearch();
       } else {
         this.$emit("search-results", {
           results: [],
@@ -96,19 +96,19 @@ export default {
       }
     },
     pageSize() {
-      this.handleSearch();
+      this.debouncedHandleSearch();
     },
     pageOffset() {
-      this.handleSearch();
+      this.debouncedHandleSearch();
     },
     selectedYear() {
-      this.handleSearch();
+      this.debouncedHandleSearch();
     },
     selectedSearchMethod() {
-      this.handleSearch();
+      this.debouncedHandleSearch();
     },
     selectedTokenizer() {
-      this.handleSearch();
+      this.debouncedHandleSearch();
       this.getYearOptions();
     }
   },
@@ -117,7 +117,23 @@ export default {
       return this.searchQuery && !this.errorExists;
     },
   },
+  created() {
+    this.debouncedHandleSearch = this.debounce(this.handleSearch, 1000); 
+  },
   methods: {
+    debounce(fn, delay) {
+      let timer;
+
+      return function(...args) {
+        if (timer) {
+          clearTimeout(timer);
+        }
+
+        timer = setTimeout(() => {
+           fn.apply(this, args);
+        }, delay);
+      }
+    },  
     async handleSearch() {
       if (this.searchQuery === "") {
         this.errorMessage = "Please enter a search query.";
