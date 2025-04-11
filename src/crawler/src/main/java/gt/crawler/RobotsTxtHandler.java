@@ -30,6 +30,7 @@ class RobotsTxtHandler {
 
     HttpClient client = HttpClient.newHttpClient();
 
+    System.out.println("Visiting robots.txt for " + url);
     HttpRequest req = HttpRequest.newBuilder()
         .uri(new URI(url + "/robots.txt"))
         .GET()
@@ -43,7 +44,7 @@ class RobotsTxtHandler {
     // purely looking for * user-agent
     try (BufferedReader reader = new BufferedReader(new StringReader(robotsContent))) {
       String line;
-      String userAgent = null;
+      String userAgent = "";
 
       while ((line = reader.readLine()) != null) {
         line = line.trim();
@@ -64,11 +65,18 @@ class RobotsTxtHandler {
         if (field.equals("user-agent")) {
           userAgent = value;
         } else {
-          if (userAgent != "*" || field != "Disallow") {
+          if (!userAgent.equals("*") || !field.equals( "disallow")) {
             continue;
           }
 
-          disallowedUrls.add(new Document("_id", url + value));
+          if (value.charAt(0) == '/') {
+            value = value.substring(1);
+            disallowedUrls.add(new Document("_id", url + value));
+          } else {
+            // if the value is not a path, we assume it's a full url
+            // and add it to the disallowed urls
+            disallowedUrls.add(new Document("_id", value));
+          }
         }
       }
     }
@@ -76,7 +84,9 @@ class RobotsTxtHandler {
     MongoDatabase database = mc.getDatabase(DATABASE_NAME);
     MongoCollection<Document> collection = database.getCollection("DisallowedUrls");
 
-    collection.insertMany(disallowedUrls);
+    if (!disallowedUrls.isEmpty()) {
+      collection.insertMany(disallowedUrls);
+    }
   }
 
   static boolean isUrlAllowed(String url) {
