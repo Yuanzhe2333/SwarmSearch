@@ -1,6 +1,8 @@
 package gt.crawler;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,17 +11,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
-
 public class Crawler implements Runnable {
 
   private MongoClient mc;
+  private Elastic elastic;
+
   private String startingUrl;
   private int bfsPerDfsRatio;
-  private Elastic elastic;
+
+  private boolean llmFlag = false;
 
   public Crawler(String startingUrl, int bfsPerDfsRatio) {
     this.mc = MongoClient.getInstance();
@@ -30,7 +30,7 @@ public class Crawler implements Runnable {
     String host = config.getConfig().getProperty("elastic.host");
     int port = Integer.parseInt(config.getConfig().getProperty("elastic.port"));
     String scheme = config.getConfig().getProperty("elastic.scheme");
-    String apiKey = config.getConfig().getProperty("elastic.apikey").trim();;
+    String apiKey = config.getConfig().getProperty("elastic.apikey").trim();
     this.elastic = new Elastic(host, port, scheme, apiKey);
   }
 
@@ -48,7 +48,11 @@ public class Crawler implements Runnable {
         }
 
         String url = doc.getString("url");
-        visitPage(url, visitedCache);
+        try {
+          visitPage(url, visitedCache);
+        } catch (Exception e) {
+          System.err.println(e);
+        }
       }
 
       org.bson.Document doc = mc.popUrlFromBack();
@@ -58,13 +62,16 @@ public class Crawler implements Runnable {
       }
 
       String url = doc.getString("url");
-      visitPage(url, visitedCache);
+      try {
+        visitPage(url, visitedCache);
+      } catch (Exception e) {
+        System.err.println(e);
+      }
     }
   }
 
-  private void visitPage(String url, Set<String> visitedCache) {
+  private void visitPage(String url, Set<String> visitedCache) throws URISyntaxException, InterruptedException {
     try {
-      
       if (visitedCache.contains(url) || mc.getDocumentFromCollection("visited", url) != null) {
         visitedCache.add(url);
         System.out.println("Already visited: " + url);
@@ -72,22 +79,49 @@ public class Crawler implements Runnable {
       }
 
       visitedCache.add(url);
+
+      if (!RobotsTxtHandler.isUrlAllowed(url)) {
+        System.out.println("Url not allowed: " + url);
+        return;
+      }
+
+      RobotsTxtHandler.handleRobotsTxt(url);
       mc.insertIntoCollection("visited", new org.bson.Document("_id", url));
 
       Document doc = Jsoup.connect(url)
           .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
           .get();
 
-      elastic.insertHtml("crawled-pages", url, doc.html());
+      if (llmFlag) {
+        elastic.insertHtml("crawled-pages", parsePageWithLLM(doc, url));
+      } else {
+        org.bson.Document elasticDoc = new org.bson.Document("html", doc.html())
+            .append("url", url);
+
+        elastic.insertHtml("crawled-pages", elasticDoc);
+      }
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {
-        String absHref = link.absUrl("href");
+        String href = link.absUrl("href");
 
-        // remove fragments
-        String parsedHref = absHref.split("#")[0];
-        mc.addUrlToBack(parsedHref);
+        // Remove protocol and fragments
+        try {
+          URI uri = new URI(href);
+          String host = uri.getHost();
+          String path = uri.getPath();
+          String protocol = uri.getScheme() + "://";
+
+          if (path == "/") {
+            path = "";
+          }
+
+          mc.addUrlToBack(protocol + host + path);
+        } catch (Error e) {
+          continue;
+        }
       }
+
       // Use this flag to enable LLM parsing
       // 0 = no LLM parsing, 1 = LLM parsing
       int LLMFlag = 0;
@@ -130,7 +164,6 @@ public class Crawler implements Runnable {
       System.out.println(parsedDoc.toJson());
       System.out.println("================================");
 
-      // ✅ Return the final JSON string with URL appended
       return parsedDoc.toJson();
   }
 }
