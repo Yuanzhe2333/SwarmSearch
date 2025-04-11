@@ -1,6 +1,6 @@
 config/
 elastic-start-local/
-src/crawler/target/
+src/crawler/target/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -13,6 +13,3 @@ __pycache__/
 
 # Dependency directories
 node_modules/
-
-# Environments
-.env
