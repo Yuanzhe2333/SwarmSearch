@@ -3,6 +3,9 @@ package gt.crawler;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +17,6 @@ import org.jsoup.select.Elements;
 public class Crawler implements Runnable {
 
   private MongoClient mc;
-  private Elastic elastic;
 
   private String startingUrl;
   private int bfsPerDfsRatio;
@@ -26,12 +28,12 @@ public class Crawler implements Runnable {
     this.startingUrl = startingUrl;
     this.bfsPerDfsRatio = bfsPerDfsRatio;
 
-    Config config = Config.getInstance();
-    String host = config.getConfig().getProperty("elastic.host");
-    int port = Integer.parseInt(config.getConfig().getProperty("elastic.port"));
-    String scheme = config.getConfig().getProperty("elastic.scheme");
-    String apiKey = config.getConfig().getProperty("elastic.apikey").trim();
-    this.elastic = new Elastic(host, port, scheme, apiKey);
+    // Config config = Config.getInstance();
+    // String host = config.getConfig().getProperty("elastic.host");
+    // int port = Integer.parseInt(config.getConfig().getProperty("elastic.port"));
+    // String scheme = config.getConfig().getProperty("elastic.scheme");
+    // String apiKey = config.getConfig().getProperty("elastic.apikey").trim();
+    // this.elastic = new Elastic(host, port, scheme, apiKey);
   }
 
   @Override
@@ -92,19 +94,37 @@ public class Crawler implements Runnable {
           .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
           .get();
 
+      HttpClient client = HttpClient.newHttpClient();
+      String reqBody;
       if (llmFlag) {
-        elastic.insertHtml("crawled-pages", parsePageWithLLM(doc, url));
+        reqBody = parsePageWithLLM(doc, url);
       } else {
-        org.bson.Document elasticDoc = new org.bson.Document("html", doc.html())
-            .append("url", url);
+        reqBody = String.format("""
+            {
+                "title": "Test Item",
+                "explanation": %s,
+                "url": "%s",
+                "date": "2025-04-10"
+            }
+            """, doc.html(), url);
+      }
 
-        elastic.insertHtml("crawled-pages", elasticDoc);
+      try {
+        HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
+            .POST(HttpRequest.BodyPublishers.ofString(reqBody))
+            .build();
+
+        client.send(req, BodyHandlers.ofString());
+      } catch (Error e) {
+        System.err.println(e);
       }
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {
         String href = link.absUrl("href");
 
+        System.out.println(href);
         // Remove protocol and fragments
         try {
           URI uri = new URI(href);
@@ -122,48 +142,39 @@ public class Crawler implements Runnable {
         }
       }
 
-      // Use this flag to enable LLM parsing
-      // 0 = no LLM parsing, 1 = LLM parsing
-      int LLMFlag = 0;
-      if (LLMFlag == 1) {
-        String LLMJsonString = parsePageWithLLM(doc, url);
-      } 
-      
-      
-
     } catch (IOException e) {
-      System.err.println("Failed to visit page: " + e.getMessage());
+      System.err.println("Failed to visit page: " + e);
     }
   }
 
   private String parsePageWithLLM(Document doc, String url) {
-      // Call LLM to parse the page content into structured JSON
-      String rawText = doc.body().text();
+    // Call LLM to parse the page content into structured JSON
+    String rawText = doc.body().text();
 
-      // OPTIONAL: limit content length
-      if (rawText.length() > 4000) {
-        rawText = rawText.substring(0, 4000);
-      }
+    // OPTIONAL: limit content length
+    if (rawText.length() > 4000) {
+      rawText = rawText.substring(0, 4000);
+    }
 
-      System.out.println("====== Raw Text Preview ======");
-      System.out.println(rawText.substring(0, Math.min(rawText.length(), 500))); // show first 500 chars
-      System.out.println("================================");
+    System.out.println("====== Raw Text Preview ======");
+    System.out.println(rawText.substring(0, Math.min(rawText.length(), 500))); // show first 500 chars
+    System.out.println("================================");
 
-      // Get JSON string from LLM
-      String llmResponse = LLMClient.analyzePageContent(rawText);
+    // Get JSON string from LLM
+    String llmResponse = LLMClient.analyzePageContent(rawText);
 
-      System.out.println("====== LLM Response ======");
-      System.out.println(llmResponse);
-      System.out.println("================================");
+    System.out.println("====== LLM Response ======");
+    System.out.println(llmResponse);
+    System.out.println("================================");
 
-      // Convert to MongoDB document and add URL
-      org.bson.Document parsedDoc = org.bson.Document.parse(llmResponse);
-      parsedDoc.append("source_url", url);
+    // Convert to MongoDB document and add URL
+    org.bson.Document parsedDoc = org.bson.Document.parse(llmResponse);
+    parsedDoc.append("source_url", url);
 
-      System.out.println("====== Parsed JSON String ======");
-      System.out.println(parsedDoc.toJson());
-      System.out.println("================================");
+    System.out.println("====== Parsed JSON String ======");
+    System.out.println(parsedDoc.toJson());
+    System.out.println("================================");
 
-      return parsedDoc.toJson();
+    return parsedDoc.toJson();
   }
 }

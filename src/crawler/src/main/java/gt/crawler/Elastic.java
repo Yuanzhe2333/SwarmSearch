@@ -13,6 +13,7 @@ import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 
+// elastic logic moved to search engine API, keeping for now
 public class Elastic {
     private ElasticsearchClient client;
 

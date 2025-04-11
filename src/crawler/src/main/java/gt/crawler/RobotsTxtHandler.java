@@ -30,7 +30,6 @@ class RobotsTxtHandler {
 
     HttpClient client = HttpClient.newHttpClient();
 
-    System.out.println("Visiting robots.txt for " + url);
     HttpRequest req = HttpRequest.newBuilder()
         .uri(new URI(url + "/robots.txt"))
         .GET()
@@ -65,7 +64,7 @@ class RobotsTxtHandler {
         if (field.equals("user-agent")) {
           userAgent = value;
         } else {
-          if (!userAgent.equals("*") || !field.equals( "disallow")) {
+          if (!userAgent.equals("*") || !field.equals("disallow")) {
             continue;
           }
 
