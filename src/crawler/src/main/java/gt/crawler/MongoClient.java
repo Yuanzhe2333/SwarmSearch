@@ -54,7 +54,7 @@ public class MongoClient {
 
   /**
    * Insert a document into a collection in the CrawlData database.
-   * 
+   *
    * @param collectionName The name of the collection to insert the document into.
    * @param doc            The document to insert.
    */
@@ -67,7 +67,7 @@ public class MongoClient {
 
   /**
    * Get a document from a collection in the CrawlData database.
-   * 
+   *
    * @param collectionName The name of the collection to get the document from.
    * @return The document from the collection.
    */
