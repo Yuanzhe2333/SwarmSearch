@@ -102,7 +102,7 @@ For the application to work, config/config.properties must be setup under src/cr
 
 You have to have `npm` installed.
 
-````
+
 1. Install the required dependencies:
 
 ```bash
