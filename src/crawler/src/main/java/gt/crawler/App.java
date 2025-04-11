@@ -4,13 +4,26 @@ import org.bson.Document;
 
 public class App {
     public static void main(String[] args) {
-        String[] seedUrls = {"https://www.cc.gatech.edu/", "https://coe.gatech.edu/", "https://cos.gatech.edu/", "https://design.gatech.edu/", "https://iac.gatech.edu/", "https://www.scheller.gatech.edu/index.html", "https://lifetimelearning.gatech.edu/"};
+        String[] seedUrls = { "https://www.cc.gatech.edu/", "https://coe.gatech.edu/", "https://cos.gatech.edu/",
+                "https://design.gatech.edu/", "https://iac.gatech.edu/", "https://www.scheller.gatech.edu/index.html",
+                "https://lifetimelearning.gatech.edu/" };
+        MongoClient mc = MongoClient.getInstance();
 
+        if (mc.countDocuments("visited") == 0) {
+            System.out.println("Inserting Seeds");
+            for (String url : seedUrls) {
+                Document doc = new Document();
+                doc.append("url", url);
+                doc.append("sequence", 1);
 
-        for (int i = 0; i < seedUrls.length; i++) {
-            Crawler c = new Crawler(seedUrls[i], 5);
+                mc.insertIntoCollection("PageQueue", doc);
+            }
+        }
+
+        int numThreads = 10;
+        for (int i = 0; i < numThreads; i++) {
+            Crawler c = new Crawler(5);
             new Thread(c).start();
-            System.out.println("Thread for seed url " + seedUrls[i] + " started.");
         }
 
     }

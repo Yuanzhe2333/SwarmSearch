@@ -1,7 +1,0 @@
-gt\crawler\Crawler.class
-gt\crawler\App.class
-gt\crawler\LLMClient.class
-gt\crawler\Config.class
-gt\crawler\Elastic.class
-gt\crawler\MongoClient.class
-gt\crawler\RobotsTxtHandler.class
