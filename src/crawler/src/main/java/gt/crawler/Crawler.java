@@ -85,7 +85,7 @@ public class Crawler implements Runnable {
         return;
       }
 
-      RobotsTxtHandler.handleRobotsTxt(url);
+      // RobotsTxtHandler.handleRobotsTxt(url);
       mc.insertIntoCollection("visited", new org.bson.Document("_id", url));
 
       Document doc = Jsoup.connect(url)
@@ -108,12 +108,13 @@ public class Crawler implements Runnable {
 
         String host = uri.getHost();
         String path = uri.getPath();
+        String protocol = uri.getScheme() + "://";
 
         if (path == "/") {
           path = "";
         }
 
-        mc.addUrlToBack(host + path);
+        mc.addUrlToBack(protocol + host + path);
       }
 
     } catch (IOException e) {
