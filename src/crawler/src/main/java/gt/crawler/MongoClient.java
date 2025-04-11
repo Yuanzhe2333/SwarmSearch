@@ -104,8 +104,22 @@ public class MongoClient {
     return doc;
   }
 
+  public long countDocuments(String collectionName) {
+    MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+    MongoCollection<Document> collection = database.getCollection(collectionName);
+
+    try {
+      long cnt = collection.countDocuments();
+      return cnt;
+    } catch (Error e) {
+      return 0;
+    }
+
+  }
+
   /**
-   * Adds a URL to the "PageQueue" Collection with the correct sequence number (doesn't guarantee its lowest - 1 because other instances could be inserting)
+   * Adds a URL to the "PageQueue" Collection with the correct sequence number
+   * (doesn't guarantee its lowest - 1 because other instances could be inserting)
    *
    * @param url to add to database
    */

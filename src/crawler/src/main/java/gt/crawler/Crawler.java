@@ -18,14 +18,12 @@ public class Crawler implements Runnable {
 
   private MongoClient mc;
 
-  private String startingUrl;
   private int bfsPerDfsRatio;
 
   private boolean llmFlag = false;
 
-  public Crawler(String startingUrl, int bfsPerDfsRatio) {
+  public Crawler(int bfsPerDfsRatio) {
     this.mc = MongoClient.getInstance();
-    this.startingUrl = startingUrl;
     this.bfsPerDfsRatio = bfsPerDfsRatio;
 
     // Config config = Config.getInstance();
@@ -39,7 +37,6 @@ public class Crawler implements Runnable {
   @Override
   public void run() {
     Set<String> visitedCache = new HashSet<>();
-    mc.addUrlToBack(this.startingUrl);
 
     while (true) {
       for (int i = 0; i < this.bfsPerDfsRatio; i++) {
