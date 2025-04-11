@@ -1,0 +1,6 @@
+elasticsearch
+fastapi
+fastapi[standard]
+torch
+tqdm
+sentence-transformers

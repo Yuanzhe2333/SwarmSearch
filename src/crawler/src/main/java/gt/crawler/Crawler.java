@@ -122,26 +122,48 @@ public class Crawler implements Runnable {
         }
       }
 
+      // Use this flag to enable LLM parsing
+      // 0 = no LLM parsing, 1 = LLM parsing
+      int LLMFlag = 0;
+      if (LLMFlag == 1) {
+        String LLMJsonString = parsePageWithLLM(doc, url);
+      } 
+      
+      
+
     } catch (IOException e) {
       System.err.println("Failed to visit page: " + e.getMessage());
     }
   }
 
-  private org.bson.Document parsePageWithLLM(Document doc, String url) {
-    String rawText = doc.body().text();
+  private String parsePageWithLLM(Document doc, String url) {
+      // Call LLM to parse the page content into structured JSON
+      String rawText = doc.body().text();
 
-    // OPTIONAL: limit content length
-    if (rawText.length() > 4000) {
-      rawText = rawText.substring(0, 4000);
-    }
+      // OPTIONAL: limit content length
+      if (rawText.length() > 4000) {
+        rawText = rawText.substring(0, 4000);
+      }
 
-    // Get JSON string from LLM
-    String llmResponse = LLMClient.analyzePageContent(rawText);
+      System.out.println("====== Raw Text Preview ======");
+      System.out.println(rawText.substring(0, Math.min(rawText.length(), 500))); // show first 500 chars
+      System.out.println("================================");
 
-    // Convert to MongoDB document and print it
-    org.bson.Document parsedDoc = org.bson.Document.parse(llmResponse);
-    parsedDoc.append("url", url);
+      // Get JSON string from LLM
+      String llmResponse = LLMClient.analyzePageContent(rawText);
 
-    return parsedDoc;
+      System.out.println("====== LLM Response ======");
+      System.out.println(llmResponse);
+      System.out.println("================================");
+
+      // Convert to MongoDB document and add URL
+      org.bson.Document parsedDoc = org.bson.Document.parse(llmResponse);
+      parsedDoc.append("source_url", url);
+
+      System.out.println("====== Parsed JSON String ======");
+      System.out.println(parsedDoc.toJson());
+      System.out.println("================================");
+
+      return parsedDoc.toJson();
   }
 }
