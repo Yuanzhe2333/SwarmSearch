@@ -22,7 +22,7 @@ public class App {
 
         int numThreads = 100;
         for (int i = 0; i < numThreads; i++) {
-            Crawler c = new Crawler(1,1);
+            Crawler c = new Crawler(1,3);
             new Thread(c).start();
         }
 
