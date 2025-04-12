@@ -41,7 +41,7 @@ public class Crawler implements Runnable {
   public void run() {
     Set<String> visitedCache = new HashSet<>();
 
-    while (mc.countDocuments("visited") < 10000) {
+    while (mc.countDocuments("visited") < 2000) {
       for (int i = 0; i < this.bfsCount; i++) {
         org.bson.Document doc = mc.popUrlFromFront();
 
@@ -84,12 +84,12 @@ public class Crawler implements Runnable {
 
       visitedCache.add(url);
 
-      if (!RobotsTxtHandler.isUrlAllowed(url)) {
-        System.out.println("Url not allowed: " + url);
-        return;
-      }
+      // if (!RobotsTxtHandler.isUrlAllowed(url)) {
+      //   System.out.println("Url not allowed: " + url);
+      //   return;
+      // }
 
-      RobotsTxtHandler.handleRobotsTxt(url);
+      // RobotsTxtHandler.handleRobotsTxt(url);
       mc.insertIntoCollection("visited", new org.bson.Document("_id", url));
 
       Document doc = Jsoup.connect(url)
