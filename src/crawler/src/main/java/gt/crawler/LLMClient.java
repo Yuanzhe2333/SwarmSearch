@@ -24,7 +24,7 @@ public class LLMClient {
   public static String analyzePageContent(String content) {
     try {
         String requestBody = "{"
-        + "\"model\": \"gpt-3.5-turbo\","
+        + "\"model\": \"gpt-4o-mini\","
         + "\"messages\": ["
         + "  {"
         + "    \"role\": \"system\","
