@@ -13,3 +13,6 @@ __pycache__/
 
 # Dependency directories
 node_modules/
+
+# Backups for Evaluation
+dump/
