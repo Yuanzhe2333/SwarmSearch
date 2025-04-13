@@ -41,7 +41,7 @@ public class Crawler implements Runnable {
   public void run() {
     Set<String> visitedCache = new HashSet<>();
 
-    while (mc.countDocuments("visited") < 2000) {
+    while (true) {
       for (int i = 0; i < this.bfsCount; i++) {
         org.bson.Document doc = mc.popUrlFromFront();
 
@@ -84,12 +84,12 @@ public class Crawler implements Runnable {
 
       visitedCache.add(url);
 
-      // if (!RobotsTxtHandler.isUrlAllowed(url)) {
-      //   System.out.println("Url not allowed: " + url);
-      //   return;
-      // }
+      if (!RobotsTxtHandler.isUrlAllowed(url)) {
+        System.out.println("Url not allowed: " + url);
+        return;
+      }
 
-      // RobotsTxtHandler.handleRobotsTxt(url);
+      RobotsTxtHandler.handleRobotsTxt(url);
       mc.insertIntoCollection("visited", new org.bson.Document("_id", url));
 
       Document doc = Jsoup.connect(url)
@@ -111,16 +111,16 @@ public class Crawler implements Runnable {
             """, doc.html(), url);
       }
 
-      // try {
-      //   HttpRequest req = HttpRequest.newBuilder()
-      //       .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
-      //       .POST(HttpRequest.BodyPublishers.ofString(reqBody))
-      //       .build();
+      try {
+        HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
+            .POST(HttpRequest.BodyPublishers.ofString(reqBody))
+            .build();
 
-      //   client.send(req, BodyHandlers.ofString());
-      // } catch (Error e) {
-      //   System.err.println(e);
-      // }
+        client.send(req, BodyHandlers.ofString());
+      } catch (Error e) {
+        System.err.println(e);
+      }
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {
