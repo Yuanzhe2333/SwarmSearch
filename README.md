@@ -53,7 +53,7 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - **Frontend:** React
 - **Backend:** Java, Spring
 - **Crawling & Parsing:** JSoup
-- **Indexing:** Apache Lucene
+- **Indexing:** Elastic
 - **Data Storage:** MongoDB
 - **Deployment:** Apache Tomcat
 
