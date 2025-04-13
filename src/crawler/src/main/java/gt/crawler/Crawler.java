@@ -18,13 +18,16 @@ public class Crawler implements Runnable {
 
   private MongoClient mc;
 
-  private int bfsPerDfsRatio;
+  private int bfsCount;
+
+  private int dfsCount;
 
   private boolean llmFlag = false;
 
-  public Crawler(int bfsPerDfsRatio) {
+  public Crawler(int bfsCount, int dfsCount) {
     this.mc = MongoClient.getInstance();
-    this.bfsPerDfsRatio = bfsPerDfsRatio;
+    this.bfsCount = bfsCount;
+    this.dfsCount = dfsCount;
 
     // Config config = Config.getInstance();
     // String host = config.getConfig().getProperty("elastic.host");
@@ -39,7 +42,7 @@ public class Crawler implements Runnable {
     Set<String> visitedCache = new HashSet<>();
 
     while (true) {
-      for (int i = 0; i < this.bfsPerDfsRatio; i++) {
+      for (int i = 0; i < this.bfsCount; i++) {
         org.bson.Document doc = mc.popUrlFromFront();
 
         if (doc == null) {
@@ -54,17 +57,19 @@ public class Crawler implements Runnable {
         }
       }
 
-      org.bson.Document doc = mc.popUrlFromBack();
+      for (int i = 0; i < this.dfsCount; i++) {
+        org.bson.Document doc = mc.popUrlFromBack();
 
-      if (doc == null) {
-        return;
-      }
+        if (doc == null) {
+          break;
+        }
 
-      String url = doc.getString("url");
-      try {
-        visitPage(url, visitedCache);
-      } catch (Exception e) {
-        System.err.println(e);
+        String url = doc.getString("url");
+        try {
+          visitPage(url, visitedCache);
+        } catch (Exception e) {
+          System.err.println(e);
+        }
       }
     }
   }
@@ -106,6 +111,7 @@ public class Crawler implements Runnable {
             """, doc.html(), url);
       }
 
+      // sends request to fastAPI for elastic indexing
       try {
         HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8000/api/v1/index_doc"))

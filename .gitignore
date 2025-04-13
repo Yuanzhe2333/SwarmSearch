@@ -14,5 +14,5 @@ __pycache__/
 # Dependency directories
 node_modules/
 
-# Environments
-.env
+# Backups for Evaluation
+Evals/
