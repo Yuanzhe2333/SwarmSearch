@@ -7,7 +7,7 @@
         class="gallery_card"
       >
         <div class="card_content">
-          <div class="image_container" @click="showImage(item['_source'])">
+          <!-- <div class="image_container" @click="showImage(item['_source'])">
             <div class="image_loader" v-if="!imageLoaded[index]"></div>
             <img
               :src="item['_source'].image_url"
@@ -16,7 +16,7 @@
               :class="{ 'image-loaded': imageLoaded[index] }"
               @load="imageLoaded[index] = true"
             />
-          </div>
+          </div> -->
           <div class="text_container">
             <h2 class="card_title">{{ item["_source"].title }}</h2>
             <p class="card_description">{{ item["_source"].explanation }}</p>

@@ -17,7 +17,7 @@
         class="input-text medium-text"
         type="text"
         v-model="searchQuery"
-        placeholder="Andromeda galaxy"
+        placeholder="Distributed Systems"
         @keyup.enter="handleSearch"
       />
       <span class="icon-container">
