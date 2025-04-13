@@ -111,6 +111,7 @@ public class Crawler implements Runnable {
             """, doc.html(), url);
       }
 
+      // sends request to fastAPI for elastic indexing
       try {
         HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
