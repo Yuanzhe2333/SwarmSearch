@@ -109,7 +109,7 @@ You have to have `npm` installed.
 pip install -r requirements.txt
 ````
 
-2. Setup indicies for Elastic (only needed once)
+2. Setup indicies for Elastic (only needed once and should already be done)
 
 ```bash
 python3 index_setup.py
