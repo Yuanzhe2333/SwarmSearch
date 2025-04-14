@@ -18,7 +18,12 @@
             />
           </div> -->
           <div class="text_container">
-            <h2 class="card_title">{{ item["_source"].title }}</h2>
+            <!-- <h2 class="card_title">{{ item["_source"].title }} -->
+            <h2 class="card_title">{{ }}
+              <a :href="item['_source'].image_url" target="_blank" rel="noopener noreferrer">
+                {{ item['_source'].title }}
+              </a>
+            </h2>
             <p class="card_description">{{ item["_source"].explanation }}</p>
             <span class="card_date">{{ item["_source"].date }}</span>
           </div>
