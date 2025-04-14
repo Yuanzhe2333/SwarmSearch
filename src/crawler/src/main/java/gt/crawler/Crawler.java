@@ -115,6 +115,7 @@ public class Crawler implements Runnable {
       try {
         HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
+            .version(HttpClient.Version.HTTP_1_1)
             .POST(HttpRequest.BodyPublishers.ofString(reqBody))
             .build();
 
