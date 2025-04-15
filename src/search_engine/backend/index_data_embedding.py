@@ -5,7 +5,7 @@ from tqdm import tqdm
 from typing import List
 from pprint import pprint
 from utils import get_es_client
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 from config import INDEX_NAME_EMBEDDING
 
 from sentence_transformers import SentenceTransformer
@@ -33,15 +33,36 @@ def _create_index(es: Elasticsearch) -> dict:
     )
 
 
-def _insert_documents(es: Elasticsearch, documents: List[dict], model: SentenceTransformer) -> dict:
-    operations = []
-    for document in tqdm(documents, total=len(documents), desc='Indexing documents'):
-        operations.append({'index': {'_index': INDEX_NAME_EMBEDDING}})
-        operations.append({
-            **document,
-            'embedding': model.encode(document['explanation'])
-        })
-    return es.bulk(operations=operations)
+def _insert_documents(es: Elasticsearch, documents: List[dict], model: SentenceTransformer, batch_size: int = 500) -> dict:
+    total_docs = len(documents)
+    for i in tqdm(range(0, total_docs, batch_size), desc="Indexing documents (batched)"):
+        batch = documents[i:i + batch_size]
+        operations = []
+
+        skipCnt = 0
+        for document in batch:
+            if not document.get('explanation'):
+                # print(f"Skipping None document: {document}")
+                skipCnt += 1
+                continue
+            try:
+                operations.append({'index': {'_index': INDEX_NAME_EMBEDDING}})
+                operations.append({
+                    **document,
+                    'embedding': model.encode(document['explanation'])
+                })
+            except Exception as e:
+                print(f"Error processing document {document.get('explanation', '')}: {e}")
+                continue
+
+        if skipCnt > 0:
+            print(f"Skipped {skipCnt} documents in this batch due to missing 'explanation' field.")
+        if operations:
+            try:
+                es.bulk(operations=operations)
+                print(f"Inserted {len(operations) // 2} documents into Elasticsearch.")
+            except Exception as e:
+                print(f"Error during bulk insert: {e}")
 
 
 if __name__ == '__main__':
