@@ -129,7 +129,7 @@ fastapi dev main.py
 
 ```bash
 npm install
-npm install -g @vue/cli@latest
+npm install -g @vue/cli@latest # This may not be needed
 ```
 
 - Run service
