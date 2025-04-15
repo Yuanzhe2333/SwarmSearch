@@ -1,21 +1,6 @@
 <template>
   <div class="pagination-bar-container">
     <div class="row">
-      <div class="year-filter">
-        <span class="medium-text">Year</span>
-        <Select
-          checkmark
-          showClear=""
-          class="custom-selector align-vertical-center"
-          v-model="selectedYear"
-          :options="yearOptions"
-          placeholder="All years"
-          :highlightOnSelect="false"
-          @update:modelValue="handleYearChange"
-          size="large"
-          v-tooltip.bottom="'Filter by year'"
-        />
-      </div>
 
       <div class="search-method">
         <span class="medium-text">Search method</span>
@@ -195,7 +180,7 @@ export default {
 }
 
 .custom-selector {
-  border-radius: 0rem;
+  border-radius: .5rem;
   height: 4rem;
   background: transparent;
   color: white !important;
@@ -215,8 +200,8 @@ export default {
   background: transparent;
   height: 4rem;
   border: 1px solid rgba(234, 94, 19, 0.2);
-  padding: 1rem;
-  border-radius: 0rem;
+  padding: 0 .8rem;
+  border-radius: .5rem;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -262,7 +247,6 @@ export default {
 
   .pagination-btn {
     height: 3rem;
-    padding: 0.5rem;
   }
 
   .pagination-buttons {

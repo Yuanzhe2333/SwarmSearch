@@ -2,9 +2,9 @@
   <div class="container">
     <a href="/" class="image-container">
       <img
-        src="../assets/galaxy_logo_white.svg"
+        src="../assets/gt_logo.svg"
         class="image-logo"
-        alt="My Universe Hub logo"
+        alt="GT logo"
       />
     </a>
 
@@ -17,7 +17,7 @@
         class="input-text medium-text"
         type="text"
         v-model="searchQuery"
-        placeholder="Andromeda galaxy"
+        placeholder="Enter your search query"
         @keyup.enter="debouncedHandleSearch"
       />
       <span class="icon-container">
@@ -118,7 +118,7 @@ export default {
     },
   },
   created() {
-    this.debouncedHandleSearch = this.debounce(this.handleSearch, 1000); 
+    this.debouncedHandleSearch = this.debounce(this.handleSearch, 1000);
   },
   methods: {
     debounce(fn, delay) {
@@ -133,7 +133,7 @@ export default {
            fn.apply(this, args);
         }, delay);
       }
-    },  
+    },
     async handleSearch() {
       if (this.searchQuery === "") {
         this.errorMessage = "Please enter a search query.";
@@ -149,7 +149,7 @@ export default {
       } else {
         endpoint = `${axios.defaults.baseURL}/api/v1/regular_search?search_query=${this.searchQuery}&skip=${this.pageOffset}&limit=${this.pageSize}&year=${year}&tokenizer=${this.selectedTokenizer}`;
       }
-      
+
       await axios
         .get(endpoint)
         .then((response) => {
@@ -258,7 +258,7 @@ export default {
 .input-text {
   width: 100%;
   height: 6rem;
-  border-radius: 0rem;
+  border-radius: .5rem;
 }
 
 .fade-enter-active,
@@ -299,7 +299,7 @@ export default {
   .container {
     margin-top: 10rem;
   }
-  
+
   .image-container {
     width: 10rem;
     margin-bottom: 6rem;
@@ -322,7 +322,7 @@ export default {
   .container {
     margin-top: 9rem;
   }
-  
+
   .image-container {
     width: 10rem;
     margin-bottom: 5rem;
@@ -333,11 +333,11 @@ export default {
   .container {
     margin-top: 8rem;
   }
-  
+
   .image-container {
     width: 7rem;
   }
-  
+
   .input-text {
     height: 3rem;
   }
@@ -355,7 +355,7 @@ export default {
   .container {
     margin-top: 6rem;
   }
-  
+
   .image-container {
     width: 5rem;
     margin-bottom: 4rem;

@@ -1,15 +1,15 @@
 <template>
-  <StarsBackground />
+  <WhiteBackground />
   <router-view />
 </template>
 
 <script>
-import StarsBackground from "@/components/StarsBackground.vue";
+import WhiteBackground from "@/components/WhiteBackground.vue";
 
 export default {
   name: "App",
   components: {
-    StarsBackground,
+    WhiteBackground,
   },
 };
 </script>
@@ -17,7 +17,7 @@ export default {
 <style>
 /* Customize PrimeVue's default color */
 :root {
-  --primary-color: #ea5e13;
+  --primary-color: #B3A369;
   --p-primary-color: var(--primary-color) !important;
   --p-select-placeholder-color: #fff !important;
   --p-select-dropdown-color: #fff !important;
