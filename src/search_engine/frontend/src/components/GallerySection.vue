@@ -1,36 +1,31 @@
 <template>
   <div class="container">
-    <div class="gallery_grid">
+    <div class="gallery_container">
       <div
         v-for="(item, index) in results"
         :key="`${item['_source'].image_url}-${searchTimestamp}`"
         class="gallery_card"
       >
         <div class="card_content">
-          <div class="image_container" @click="showImage(item['_source'])">
-            <div class="image_loader" v-if="!imageLoaded[index]"></div>
-            <img
-              :src="item['_source'].image_url"
-              :alt="item['_source'].title"
-              class="card_image"
-              :class="{ 'image-loaded': imageLoaded[index] }"
-              @load="imageLoaded[index] = true"
-            />
-          </div>
           <div class="text_container">
-            <h2 class="card_title">{{ item["_source"].title }}</h2>
+            <a
+            :href="`${ item['_source'].image_url }`"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="custom_link"
+            >
+            <h2 class="card_title">{{ item["_source"].title || "No Title"}}</h2>
+            </a>
+
+          <!-- image_url is the actual url for now -->
+            <h5>{{ item["_source"].image_url }}</h5>
             <p class="card_description">{{ item["_source"].explanation }}</p>
             <span class="card_date">{{ item["_source"].date }}</span>
           </div>
         </div>
       </div>
     </div>
-    <ImagePopover
-      :show="showPopover"
-      :image-url="selectedImage?.image_url"
-      :image-title="selectedImage?.title"
-      @close="closePopover"
-    />
+
   </div>
 </template>
 
@@ -88,9 +83,9 @@ export default {
   margin-bottom: 5rem;
 }
 
-.gallery_grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.gallery_container {
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
   margin: 0 auto;
 }
@@ -98,6 +93,7 @@ export default {
 .gallery_card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(234, 94, 19, 0.2);
+  border-radius: .5rem;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -105,6 +101,11 @@ export default {
 .gallery_card:hover {
   transform: translateY(-0.5rem);
   box-shadow: 0 0.5rem 1.25rem rgba(234, 94, 19, 0.2);
+}
+
+.custom_link {
+  text-decoration: none;
+  color: inherit;
 }
 
 .card_content {
@@ -154,7 +155,7 @@ export default {
 }
 
 .card_description {
-  color: #fff;
+  color: #000000;
   margin: 0;
   line-height: 1.75;
   flex-grow: 1;
