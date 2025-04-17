@@ -155,22 +155,15 @@ public class Crawler implements Runnable {
     // Call LLM to parse the page content into structured JSON
     String rawText = doc.body().text();
 
-    // OPTIONAL: limit content length
-    if (rawText.length() > 4000) {
-      rawText = rawText.substring(0, 4000);
-    }
-
     System.out.println("====== Raw Text Preview ======");
     System.out.println(rawText.substring(0, Math.min(rawText.length(), 500))); // show first 500 chars
     System.out.println("================================");
 
     // Get JSON string from LLM
     String llmResponse = LLMClient.analyzePageContent(rawText);
-
     System.out.println("====== LLM Response ======");
     System.out.println(llmResponse);
     System.out.println("================================");
-
     // Convert to MongoDB document and add URL
     org.bson.Document parsedDoc = org.bson.Document.parse(llmResponse);
     parsedDoc.append("source_url", url);
