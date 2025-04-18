@@ -1,5 +1,8 @@
 package gt.crawler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.Document;
 
 import com.mongodb.ConnectionString;
@@ -9,7 +12,6 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndDeleteOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
@@ -117,39 +119,7 @@ public class MongoClient {
 
   }
 
-  /**
-   * Adds a URL to the "PageQueue" Collection with the correct sequence number
-   * (doesn't guarantee its lowest - 1 because other instances could be inserting)
-   *
-   * @param url to add to database
-   */
-  public void addUrlToFront(String url) {
-    MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
-    MongoCollection<Document> collection = database.getCollection("PageQueue");
-
-    Document doc = collection.find().sort(Sorts.ascending("sequence")).limit(1)
-        .first();
-
-    long newSeq;
-    if (doc == null) {
-      newSeq = 0;
-    } else {
-      newSeq = doc.getLong("sequence") - 1;
-    }
-
-    Document urlDoc = new Document()
-        .append("url", url)
-        .append("sequence", newSeq);
-
-    collection.insertOne(urlDoc);
-  }
-
-  /**
-   * Adds a URL to the "PageQueue" Collection with the correct sequence number
-   *
-   * @param url to add to database
-   */
-  public void addUrlToBack(String url) {
+  public void addUrlsToBack(List<String> urls) {
     MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
     MongoCollection<Document> collection = database.getCollection("PageQueue");
 
@@ -160,14 +130,18 @@ public class MongoClient {
     if (doc == null) {
       newSeq = 0;
     } else {
-      newSeq = doc.getLong("sequence") + 1;
+      newSeq = doc.getLong("sequence") - 1;
     }
 
-    Document urlDoc = new Document()
-        .append("url", url)
-        .append("sequence", newSeq);
+    List<Document> docs = new ArrayList<>();
 
-    collection.insertOne(urlDoc);
+    for (int i = 0; i < urls.size(); i++) {
+      // leads to duplicate key errors but slows down the program too much if I check
+      // every one
+      docs.add(new Document().append("url", urls.get(i)).append("sequence", newSeq + i));
+    }
+
+    collection.insertMany(docs);
   }
 
   /**

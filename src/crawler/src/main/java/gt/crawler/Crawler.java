@@ -6,7 +6,9 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jsoup.Jsoup;
@@ -78,7 +80,6 @@ public class Crawler implements Runnable {
     try {
       if (visitedCache.contains(url) || mc.getDocumentFromCollection("visited", url) != null) {
         visitedCache.add(url);
-        System.out.println("Already visited: " + url);
         return;
       }
 
@@ -98,15 +99,16 @@ public class Crawler implements Runnable {
 
       HttpClient client = HttpClient.newHttpClient();
       String reqBody;
+
       if (llmFlag) {
         reqBody = parsePageWithLLM(doc, url);
       } else {
         reqBody = String.format("""
             {
-                "title": "Test Item",
-                "explanation": %s,
-                "url": "%s",
-                "date": "2025-04-10"
+            "title": "Test Item",
+            "explanation": %s,
+            "url": "%s",
+            "date": "2025-04-10"
             }
             """, doc.html(), url);
       }
@@ -125,10 +127,11 @@ public class Crawler implements Runnable {
       }
 
       Elements links = doc.select("a[href]");
+      List<String> urls = new ArrayList<>();
+
       for (Element link : links) {
         String href = link.absUrl("href");
 
-        System.out.println(href);
         // Remove protocol and fragments
         try {
           URI uri = new URI(href);
@@ -139,12 +142,17 @@ public class Crawler implements Runnable {
           if (path == "/") {
             path = "";
           }
+          String newUrl = protocol + host + path;
 
-          mc.addUrlToBack(protocol + host + path);
+          if (visitedCache.contains(newUrl)) {
+            continue;
+          }
+          urls.add(protocol + host + path);
         } catch (Error e) {
           continue;
         }
       }
+      mc.addUrlsToBack(urls);
 
     } catch (IOException e) {
       System.err.println("Failed to visit page: " + e);

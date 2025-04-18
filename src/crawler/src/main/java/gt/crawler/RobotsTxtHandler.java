@@ -9,7 +9,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.bson.Document;
 
@@ -20,6 +22,7 @@ import com.mongodb.client.model.Filters;
 class RobotsTxtHandler {
   private static String DATABASE_NAME = "CrawlData";
   private static com.mongodb.client.MongoClient mc = MongoClient.getInstance().getMongoClient();
+  private static Set<String> disallowedCache = new HashSet<>();
 
   /**
    * Visits the robots.txt if there is one, and adds disallowed urls to a database
@@ -89,9 +92,19 @@ class RobotsTxtHandler {
   }
 
   static boolean isUrlAllowed(String url) {
+    if (disallowedCache.contains(url)) {
+      return false;
+    }
+
     MongoDatabase database = mc.getDatabase(DATABASE_NAME);
     MongoCollection<Document> collection = database.getCollection("DisallowedUrls");
 
-    return collection.find(Filters.eq("_id", url)).first() == null;
+    boolean allowed = collection.find(Filters.eq("_id", url)).first() == null;
+
+    if (!allowed) {
+      disallowedCache.add(url);
+    }
+
+    return allowed;
   }
 }
