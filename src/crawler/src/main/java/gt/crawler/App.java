@@ -20,7 +20,7 @@ public class App {
             }
         }
 
-        int numThreads = 160;
+        int numThreads = 320;
         for (int i = 0; i < numThreads; i++) {
             Crawler c = new Crawler(5,1);
             new Thread(c).start();
