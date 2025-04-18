@@ -96,33 +96,33 @@ public class Crawler implements Runnable {
           .userAgent("Mozilla/5.0 (compatible; GTCrawler/1.0)")
           .get();
 
-      HttpClient client = HttpClient.newHttpClient();
-      String reqBody;
-      if (llmFlag) {
-        reqBody = parsePageWithLLM(doc, url);
-      } else {
-        reqBody = String.format("""
-            {
-                "title": "Test Item",
-                "explanation": %s,
-                "url": "%s",
-                "date": "2025-04-10"
-            }
-            """, doc.html(), url);
-      }
+      // HttpClient client = HttpClient.newHttpClient();
+      // String reqBody;
+      // if (llmFlag) {
+      //   reqBody = parsePageWithLLM(doc, url);
+      // } else {
+      //   reqBody = String.format("""
+      //       {
+      //           "title": "Test Item",
+      //           "explanation": %s,
+      //           "url": "%s",
+      //           "date": "2025-04-10"
+      //       }
+      //       """, doc.html(), url);
+      // }
 
       // sends request to fastAPI for elastic indexing
-      try {
-        HttpRequest req = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
-            .version(HttpClient.Version.HTTP_1_1)
-            .POST(HttpRequest.BodyPublishers.ofString(reqBody))
-            .build();
+      // try {
+      //   HttpRequest req = HttpRequest.newBuilder()
+      //       .uri(URI.create("http://localhost:8000/api/v1/index_doc"))
+      //       .version(HttpClient.Version.HTTP_1_1)
+      //       .POST(HttpRequest.BodyPublishers.ofString(reqBody))
+      //       .build();
 
-        client.send(req, BodyHandlers.ofString());
-      } catch (Error e) {
-        System.err.println(e);
-      }
+      //   client.send(req, BodyHandlers.ofString());
+      // } catch (Error e) {
+      //   System.err.println(e);
+      // }
 
       Elements links = doc.select("a[href]");
       for (Element link : links) {
