@@ -1,15 +1,13 @@
 <template>
   <div class="container">
     <a href="/" class="image-container">
-      <img
-        src="../assets/gt_logo.svg"
-        class="image-logo"
-        alt="GT logo"
-      />
+      <img src="../assets/gt_logo.svg" class="image-logo" alt="GT logo" />
     </a>
 
     <Transition name="fade">
-      <div v-if="errorExists" class="error-message small-text">{{ errorMessage }}</div>
+      <div v-if="errorExists" class="error-message small-text">
+        {{ errorMessage }}
+      </div>
     </Transition>
 
     <div class="search-container">
@@ -79,7 +77,7 @@ export default {
       yearOptions: {},
       selectedYear: null,
       selectedSearchMethod: "Regular search",
-      selectedTokenizer: "Standard"
+      selectedTokenizer: "Standard",
     };
   },
   watch: {
@@ -110,7 +108,7 @@ export default {
     selectedTokenizer() {
       this.debouncedHandleSearch();
       this.getYearOptions();
-    }
+    },
   },
   computed: {
     canPerformSearch() {
@@ -124,15 +122,15 @@ export default {
     debounce(fn, delay) {
       let timer;
 
-      return function(...args) {
+      return function (...args) {
         if (timer) {
           clearTimeout(timer);
         }
 
         timer = setTimeout(() => {
-           fn.apply(this, args);
+          fn.apply(this, args);
         }, delay);
-      }
+      };
     },
     async handleSearch() {
       if (this.searchQuery === "") {
@@ -141,8 +139,8 @@ export default {
         return;
       }
 
-      const year = this.selectedYear ? this.selectedYear.slice(0, 4) : ''
-      let endpoint = ""
+      const year = this.selectedYear ? this.selectedYear.slice(0, 4) : "";
+      let endpoint = "";
 
       if (this.selectedSearchMethod === "Semantic search") {
         endpoint = `${axios.defaults.baseURL}/api/v1/semantic_search?search_query=${this.searchQuery}&skip=${this.pageOffset}&limit=${this.pageSize}&year=${year}`;
@@ -168,7 +166,7 @@ export default {
           console.error(error);
           this.errorMessage = error.response
             ? error.response.data
-            : 'An error occurred. Please try again.';
+            : "An error occurred. Please try again.";
           this.errorExists = true;
         });
     },
@@ -207,7 +205,7 @@ export default {
     },
     handleTokenizerChange(tokenizer) {
       this.selectedTokenizer = tokenizer;
-    }
+    },
   },
 };
 </script>
@@ -215,6 +213,7 @@ export default {
 <style scoped>
 .container {
   margin-top: 12rem;
+  background-color: #fff;
 }
 
 .image-container {
@@ -229,6 +228,7 @@ export default {
 }
 
 .search-container {
+  background-color: #fff;
   width: 100%;
   position: relative;
   display: inline-block;
@@ -256,9 +256,11 @@ export default {
 }
 
 .input-text {
+  background-color: #fff;
+  color: #000;
   width: 100%;
   height: 6rem;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
 }
 
 .fade-enter-active,

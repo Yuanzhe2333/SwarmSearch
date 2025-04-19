@@ -9,23 +9,24 @@
         <div class="card_content">
           <div class="text_container">
             <a
-            :href="`${ item['_source'].image_url }`"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="custom_link"
+              :href="`${item['_source'].image_url}`"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="custom_link"
             >
-            <h2 class="card_title">{{ item["_source"].title || "No Title"}}</h2>
+              <h2 class="card_title">
+                {{ item["_source"].title || "No Title" }}
+              </h2>
             </a>
 
-          <!-- image_url is the actual url for now -->
-            <h5>{{ item["_source"].image_url }}</h5>
+            <!-- image_url is the actual url for now -->
+            <h5 class="card_url">{{ item["_source"].image_url }}</h5>
             <p class="card_description">{{ item["_source"].explanation }}</p>
             <span class="card_date">{{ item["_source"].date }}</span>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -93,7 +94,7 @@ export default {
 .gallery_card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(234, 94, 19, 0.2);
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -103,9 +104,13 @@ export default {
   box-shadow: 0 0.5rem 1.25rem rgba(234, 94, 19, 0.2);
 }
 
+.card_url {
+  color: #000;
+}
+
 .custom_link {
+  color: #000;
   text-decoration: none;
-  color: inherit;
 }
 
 .card_content {

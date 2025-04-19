@@ -1,23 +1,19 @@
 <template>
-  <WhiteBackground />
   <router-view />
 </template>
 
 <script>
-import WhiteBackground from "@/components/WhiteBackground.vue";
-
 export default {
   name: "App",
-  components: {
-    WhiteBackground,
-  },
+  components: {},
 };
 </script>
 
 <style>
 /* Customize PrimeVue's default color */
 :root {
-  --primary-color: #B3A369;
+  background-color: #fff;
+  --primary-color: #b3a369;
   --p-primary-color: var(--primary-color) !important;
   --p-select-placeholder-color: #fff !important;
   --p-select-dropdown-color: #fff !important;
@@ -141,5 +137,4 @@ body {
     margin-right: 1rem;
   }
 }
-
 </style>

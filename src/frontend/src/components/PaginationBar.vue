@@ -1,7 +1,6 @@
 <template>
   <div class="pagination-bar-container">
     <div class="row">
-
       <div class="search-method">
         <span class="medium-text">Search method</span>
         <Select
@@ -37,21 +36,23 @@
         </div>
       </Transition>
 
-      <div class="page-size">
-        <span class="medium-text">Items per page</span>
-        <Select
-          checkmark
-          class="custom-selector align-vertical-center"
-          v-model="selectedPageSize"
-          :options="pageSizes"
-          :placeholder="selectedPageSize"
-          :highlightOnSelect="false"
-          :modelValue="selectedPageSize"
-          @update:modelValue="handlePageSizeChange"
-          size="large"
-          v-tooltip.bottom="'Change the number of items per page'"
-        />
-      </div>
+      <Transition name="fade">
+        <div class="page-size">
+          <span class="medium-text">Items per page</span>
+          <Select
+            checkmark
+            class="custom-selector align-vertical-center"
+            v-model="selectedPageSize"
+            :options="pageSizes"
+            placeholder="selectedPageSize"
+            :highlightOnSelect="false"
+            :modelValue="selectedPageSize"
+            @update:modelValue="handlePageSizeChange"
+            size="large"
+            v-tooltip.bottom="'Change the number of items per page'"
+          />
+        </div>
+      </Transition>
     </div>
   </div>
 
@@ -62,7 +63,8 @@
       class="pagination-btn medium-text"
       v-tooltip.bottom="'Go to the first page'"
     >
-      <i class="fas fa-angle-double-left"></i> <span class="button-text">First</span>
+      <i class="fas fa-angle-double-left"></i>
+      <span class="button-text">First</span>
     </button>
     <button
       :disabled="currentPage === 1"
@@ -70,7 +72,8 @@
       class="pagination-btn medium-text"
       v-tooltip.bottom="'Go to the previous page'"
     >
-      <i class="fas fa-chevron-left"></i> <span class="button-text">Previous</span>
+      <i class="fas fa-chevron-left"></i>
+      <span class="button-text">Previous</span>
     </button>
 
     <span class="current-page medium-text">
@@ -91,7 +94,8 @@
       v-tooltip.bottom="'Go to the last page'"
       class="pagination-btn medium-text"
     >
-      <i class="fas fa-angle-double-right"></i> <span class="button-text">Last</span>
+      <i class="fas fa-angle-double-right"></i>
+      <span class="button-text">Last</span>
     </button>
   </div>
 </template>
@@ -168,6 +172,7 @@ export default {
   width: 100%;
   border: 1px solid rgba(234, 94, 19, 0.2);
   background: rgba(255, 255, 255, 0.05);
+  color: #000;
   padding: 1.5rem;
   margin-top: 2rem;
 }
@@ -177,17 +182,19 @@ export default {
   gap: 1.25rem;
   flex-wrap: wrap;
   justify-content: space-between;
+  color: #000;
 }
 
 .custom-selector {
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   height: 4rem;
   background: transparent;
-  color: white !important;
+  color: #000;
   width: 100%;
 }
 
 .pagination-buttons {
+  color: #000;
   display: flex;
   align-items: center;
   justify-content: end;
@@ -197,11 +204,12 @@ export default {
 }
 
 .pagination-btn {
+  color: #000;
   background: transparent;
   height: 4rem;
   border: 1px solid rgba(234, 94, 19, 0.2);
-  padding: 0 .8rem;
-  border-radius: .5rem;
+  padding: 0 0.8rem;
+  border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -238,6 +246,7 @@ export default {
   align-items: start;
   gap: 0.5rem;
   flex-grow: 1;
+  color: #000;
 }
 
 @media screen and (max-width: 992px) {
