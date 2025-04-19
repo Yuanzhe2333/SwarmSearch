@@ -29,7 +29,6 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - Preprocessed results are transformed into structured JSON format to aid semantic indexing and relevance scoring.
 - Helps normalize inconsistent structures across Georgia Tech’s various department pages.
 
-
 ### Indexing & Search
 
 - Uses ElasticSearch to create and manage a powerful reverse index for fast query retrieval.
@@ -104,6 +103,7 @@ source .venv/bin/activate
 2. Install the required dependencies:
 
 ```bash
+pip install "fastapi[standard]"
 pip install -r requirements.txt
 ```
 
