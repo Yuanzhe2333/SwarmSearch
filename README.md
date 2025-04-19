@@ -38,10 +38,14 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 ### User Interface
 
 - Designed with Vue.js for a clean, intuitive user experience.
-- Features advanced search capabilities, auto-complete suggestions, filters, and pagination.
+- Features search capabilities for semantic and N-gram search.
 
 ## Evaluation and Testing
 
+### BFS to DFS crawl ratio
+- Testing which ratio creates the highest number of crawled URLs with 'gatech.edu' as the root domain.
+- Tests 1:1, 1:3, 1:5, 3:1, 5:1, 1:0, 0:1
+  
 ### Relevance and Precision
 
 - Precision testing against Google’s search results for Georgia Tech-specific queries.
