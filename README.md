@@ -24,18 +24,13 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 
 ### Indexing & Search
 
-- Uses Apache Lucene to create and manage a powerful reverse index for fast query retrieval.
+- Uses ElasticSearch to create and manage a powerful reverse index for fast query retrieval.
 - Tests multiple scoring algorithms, including BM25, TF-IDF, LMJelinekMercer, and DFR similarity models, to identify the best-performing solution.
 
 ### User Interface
 
-- Designed with React for a clean, intuitive user experience.
+- Designed with Vue.js for a clean, intuitive user experience.
 - Features advanced search capabilities, auto-complete suggestions, filters, and pagination.
-
-### Deployment
-
-- Backend services implemented using Spring Boot for efficient API handling.
-- Initial deployment on Apache Tomcat to test in a controlled environment.
 
 ## Evaluation and Testing
 
@@ -50,17 +45,10 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 
 ## Technology Stack
 
-- **Frontend:** React
-- **Backend:** Java, Spring
-- **Crawling & Parsing:** JSoup
+- **Frontend:** Vue.js
+- **Search Engine:** Python + Fast API
+- **Crawling & Parsing:** Java + JSoup + MongoDB
 - **Indexing:** Elastic
-- **Data Storage:** MongoDB
-- **Deployment:** Apache Tomcat
-
-## Deployment
-
-- Deployed initially on local servers using Apache Tomcat for controlled testing environments.
-- Open-source deployment setup for future scalability.
 
 ## Contributors
 
@@ -68,7 +56,6 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - Tracy Guo
 - Yuanzhe Liu
 - Yen-Shun Lu
-- Pian Wan
 
 ## Installation Instructions
 
@@ -90,28 +77,32 @@ mvn clean compile exec:java
 
 For the application to work, config/config.properties must be setup under src/crawler with the following properties:
 
-1. mongodb.uri: The complete MongoDB URI to connect to the database. This should include the protocol, username, password, host, and any necessary connection parameters.
-2. elastic.host: The hostname or IP address where your Elasticsearch instance is hosted.
-3. elastic.port: The port number the Elastic instance is running on.
-4. elastic.scheme: The URL scheme used to connect to Elasticsearch (http or https).
-5. elastic.apikey: The Base64-encoded API key used to authenticate requests to your Elasticsearch instance. Make sure there are no leading or trailing spaces.
+1. mongodb.uri: The complete MongoDB URI to connect to the database. This should include the protocol, username, password, host, and any necessary connection parameters. We can provide this for the grading but any MongoDB instance will work.
 
-### Search Engine (under src/search_engine/backend)
+### Search Engine (under src/search_engine/)
 
 #### Prerequisite
 
 You have to have `npm` installed.
 
+1. (Optional) Create a virtual env and activate using the first command if on Windows, otherwise use second command.
 
-1. Install the required dependencies:
+```bash
+python3 -m venv .venv
+./venv/Scripts/Activate.ps1
+source .venv/bin/activate
+```
+
+2. Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
-````
+```
 
 2. Setup indicies for Elastic
+
 - DO NOT run if there is already data, as it will delete the data.
-- This is already done, so do not run this.
+- This is already done, so do not run this unless doing on fresh Elastic node.
 
 ```bash
 python3 index_setup.py
@@ -123,7 +114,7 @@ python3 index_setup.py
 fastapi dev main.py
 ```
 
-### Frontend (under src/search_engine/frontend)
+### Frontend (under src/frontend)
 
 - Install required packages
 
@@ -142,4 +133,4 @@ npm run serve
 
 For questions or contributions, please contact:
 
-`{ozhang31, tguo72, yliu3794, ylu776, pianwan}@gatech.edu`
+`{ozhang31, tguo72, yliu3794, ylu776}@gatech.edu`
