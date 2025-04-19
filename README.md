@@ -22,6 +22,14 @@ General-purpose search engines like Google or Yahoo often return excessive unrel
 - Employs a combination of Breadth-First Search (BFS) and Depth-First Search (DFS) crawling strategies to optimize data collection.
 - Implements MongoDB to store crawled URLs for scalability and rapid retrieval.
 
+### LLM Preprocessing
+
+- Integrates large language models (LLMs) to preprocess and summarize crawled HTML pages before indexing.
+- Strips boilerplate HTML content and extracts the core semantic meaning, improving downstream search accuracy.
+- Preprocessed results are transformed into structured JSON format to aid semantic indexing and relevance scoring.
+- Helps normalize inconsistent structures across Georgia Tech’s various department pages.
+
+
 ### Indexing & Search
 
 - Uses ElasticSearch to create and manage a powerful reverse index for fast query retrieval.
